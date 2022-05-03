@@ -1,9 +1,9 @@
 
 def parse_equation(equation):
-    result = equation.replace('+','')
+    result = equation.replace('+', '')
     d = dict(x.split('x') for x in result.split())
 
-    d = {v: k for k, v in d.items()}
+    d = {f"x{v}": k for k, v in d.items()}
 
     for key, value in d.items():
         if value == '-':
@@ -12,6 +12,7 @@ def parse_equation(equation):
             d[key] = 1
 
     return d
+
 
 def parse_restriction(restriction):
 
@@ -22,17 +23,7 @@ def parse_restriction(restriction):
 
     if(restriction.find('<')):
         upper_bound = True
-    
-    equation[1] = equation[1].replace(' ','')
 
-    print(d, upper_bound, equation[1]) 
+    equation[1] = equation[1].replace(' ', '')
 
     return(d, upper_bound, equation[1])
-
-
-str = "-3.8x1 + x2 -2x3 <= 35"
-
-p = parse_restriction(str)
-
-print(p[0])
-
