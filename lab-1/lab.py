@@ -93,4 +93,4 @@ def parse_problem(objective, restrictions, maximize):
                 i += 1
         iteration += 1
 
-    return(list_obj, list_var, list_rest)
+    return(list_obj, list_rest, list_var)
