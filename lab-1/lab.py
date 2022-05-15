@@ -91,11 +91,6 @@ def parse_problem(objective, restrictions, maximize):
                     list_rest[i].insert(len(list_rest[i])-1, 0)
                     list_rest[i].insert(len(list_rest[i])-1, 0)
                 i += 1
-
-        if(iteration == n_restrictions):
-            for y in restrictions:
-                restriction_dict = parse_restriction(y)
-
         iteration += 1
 
     return(list_obj, list_var, list_rest)
