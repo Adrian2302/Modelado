@@ -33,7 +33,7 @@ def parse_restriction(restriction):
 
     return(d, upper_bound, equation[1])
 
-
+#AAAA
 def parse_problem(objective, restrictions, maximize):
     list_obj = []
     list_var = []
@@ -41,7 +41,7 @@ def parse_problem(objective, restrictions, maximize):
 
     equation = parse_equation(objective)
     for key, value in equation.items():
-        list_obj.append(value)
+        list_obj.append(float(value))
         list_var.append(key)
 
     n_variables = len(list_var)
@@ -52,11 +52,11 @@ def parse_problem(objective, restrictions, maximize):
         for i in range(n_variables):
             val = restriction_dict[0].get('x' + str(i+1))
             if (val != None):
-                restriction.append(val)
+                restriction.append(float(val))
             else:
-                restriction.append(0)
+                restriction.append(0.0)
             if(i == n_variables-1):
-                restriction.append(restriction_dict[2])
+                restriction.append(float(restriction_dict[2]))
 
         list_rest.append(restriction)
     n_restrictions = len(list_rest)
@@ -67,31 +67,31 @@ def parse_problem(objective, restrictions, maximize):
 
         if(restriction_dict[1] == True):
             list_var.append('s' + str(iteration))
-            list_obj.append(0)
+            list_obj.append(0.0)
             i = 0
             while i < n_restrictions:
                 if(i == iteration-1):
-                    list_rest[i].insert(len(list_rest[i])-1, 1)
+                    list_rest[i].insert(len(list_rest[i])-1, 1.0)
                 else:
-                    list_rest[i].insert(len(list_rest[i])-1, 0)
+                    list_rest[i].insert(len(list_rest[i])-1, 0.0)
                 i += 1
 
         else:
             list_var.append('s' + str(iteration))
             list_var.append('a' + str(iteration))
-            list_obj.append(0)
+            list_obj.append(0.0)
             if(maximize == True):
-                list_obj.append(-1000000000000)
+                list_obj.append(-1000000000000.0)
             else:
-                list_obj.append(1000000000000)
+                list_obj.append(1000000000000.0)
             i = 0
             while i < n_restrictions:
                 if(i == iteration-1):
-                    list_rest[i].insert(len(list_rest[i])-1, -1)
-                    list_rest[i].insert(len(list_rest[i])-1, 1)
+                    list_rest[i].insert(len(list_rest[i])-1, -1.0)
+                    list_rest[i].insert(len(list_rest[i])-1, 1.0)
                 else:
-                    list_rest[i].insert(len(list_rest[i])-1, 0)
-                    list_rest[i].insert(len(list_rest[i])-1, 0)
+                    list_rest[i].insert(len(list_rest[i])-1, 0.0)
+                    list_rest[i].insert(len(list_rest[i])-1, 0.0)
                 i += 1
         iteration += 1
 
