@@ -133,13 +133,23 @@ def solve_simplex_r(values, variables, restrictions, cb_col, var_col, zj_row, z_
     z_zj_row = np.subtract(values, zj_row)
 
     # Se verifica condición de parada
-
+    iteration_success = False
     if maximize:
         if z_zj_row <= 0:
-            return  # hay que calcular el resultado
+            iteration_success = True
     else:
         if z_zj_row >= 0:
-            return  # hay que calcular el resultado
+            iteration_success = True
+
+    # Si ya se cumple la condicion de parada se retorna el resultado
+    if iteration_success:
+        b_col = restrictions[:, -1]
+        result = np.dot(cb_col, b_col)  # Se calcula el minimo o maximo
+        # diccionario de soluciones
+        solution = dict[str, float] = dict()
+        for i in range(0, len(cb_col)):
+            solution[cb_col[i]] = b_col[i]
+        return solution, result
 
     # Se calcula la columna del pivote
     pivot_col = -1
@@ -171,5 +181,5 @@ def solve_simplex_r(values, variables, restrictions, cb_col, var_col, zj_row, z_
                 restrictions[pivot_row, :], difference)
             restrictions[row] = np.subtract(
                 restrictions[0], multiplied_difference)
-
+    # llamado recursivo
     return solve_simplex_r(values, variables, restrictions, cb_col, var_col, zj_row, z_zj_row, maximize)
