@@ -33,7 +33,7 @@ def parse_restriction(restriction):
 
     return(d, upper_bound, equation[1])
 
-#AAAA
+
 def parse_problem(objective, restrictions, maximize):
     list_obj = []
     list_var = []
@@ -107,12 +107,14 @@ def simplex(objective, restrictions, variables, maximize) -> (dict[str, float], 
     # Armamos la columna Cb y var, filas Zj y Z-zj
     cb_col = np.array([None]*num_restrictions)
     var_col = np.array([None]*num_restrictions)
-    zj_row = np.empty_like(values)
-    z_zj_row = np.empty_like(values)
+    zj_row = np.zeros_like(values)
+    z_zj_row = np.zeros_like(values)
     # Se agregan las restricciones
-    for r in range(0, num_restrictions):
-        cb_col[r] = values[r]
-        var_col[r] = variables[r]
+    slack_vars = [v for v in variables if "s" in v]
+    slack_start_index = len(variables) - len(slack_vars)
+    for s in range(0, len(slack_vars)):
+        cb_col[s] = values[s+slack_start_index-1]
+        var_col[s] = variables[s+slack_start_index-1]
     # Se prefieren las variables artificiales en var_col y cb_col
     artifical_vars = [v for v in variables if "a" in v]
     art_start_index = len(variables) - len(artifical_vars)
@@ -122,23 +124,30 @@ def simplex(objective, restrictions, variables, maximize) -> (dict[str, float], 
         cb_col[sub_index] = values[art_start_index]
         art_start_index += 1
 
-    return solve_simplex_r(values, variables, restrictions, cb_col, var_col, zj_row, z_zj_row, maximize)
+    return solve_simplex_r(values, variables, restrictions, cb_col, var_col, zj_row, z_zj_row, maximize, 0)
 
 
-def solve_simplex_r(values, variables, restrictions, cb_col, var_col, zj_row, z_zj_row, maximize) -> (dict[str, float], float):
+def solve_simplex_r(values, variables, restrictions, cb_col, var_col, zj_row, z_zj_row, maximize, iteracion) -> (dict[str, float], float):
+    print(f'--------------------------- Iteracion {iteracion}')
+    print(f'Cb {cb_col} , Vars {var_col}')
+    if iteracion > 3:
+        return
     # Se calcula zj
+    print(f'Zj Prev {zj_row}')
+    print(f'Z-Zj Prev {z_zj_row}')
     for i in range(0, len(zj_row)):
+        print(f'Zj[{i}] = {cb_col} * {restrictions[:,i]}')
         zj_row[i] = np.dot(cb_col, restrictions[:, i])
     # Se calcula z - zj
     z_zj_row = np.subtract(values, zj_row)
-
+    print(f'Zj: {zj_row}\n Z-Zj: {z_zj_row}')
     # Se verifica condición de parada
     iteration_success = False
     if maximize:
-        if z_zj_row <= 0:
+        if np.all(z_zj_row <= 0):
             iteration_success = True
     else:
-        if z_zj_row >= 0:
+        if np.all(z_zj_row >= 0):
             iteration_success = True
 
     # Si ya se cumple la condicion de parada se retorna el resultado
@@ -165,7 +174,7 @@ def solve_simplex_r(values, variables, restrictions, cb_col, var_col, zj_row, z_
     pivot_row = -1
     lowest_ratio = 1000000
     for i in range(len(restrictions)):
-        val = [i]
+        val = ratios[i]
         if val > 0 and val < lowest_ratio:
             pivot_row = i
     # Ya se tiene el pivote, se pone en 1 la fila del pivote si no lo esta
@@ -182,4 +191,4 @@ def solve_simplex_r(values, variables, restrictions, cb_col, var_col, zj_row, z_
             restrictions[row] = np.subtract(
                 restrictions[0], multiplied_difference)
     # llamado recursivo
-    return solve_simplex_r(values, variables, restrictions, cb_col, var_col, zj_row, z_zj_row, maximize)
+    return solve_simplex_r(values, variables, restrictions, cb_col, var_col, zj_row, z_zj_row, maximize, iteracion+1)
