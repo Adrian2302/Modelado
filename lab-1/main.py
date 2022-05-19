@@ -12,4 +12,4 @@ if __name__ == "__main__":
 
     solution = simplex_solver(objective, restrictions_list, maximize)
     print(
-        f"Simplex call:\n Sol: {solution[0]}\nOptimized max/min: {solution[1]}")
+        f"Simplex call:\nSol: {solution[0]}\nOptimized max/min: {solution[1]}")
