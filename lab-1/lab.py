@@ -116,9 +116,7 @@ def simplex(objective, restrictions, variables, maximize) -> (dict[str, float], 
     for s in range(0, len(slack_vars)):
         cb_col[s] = values[s+slack_start_index]
         var_col[s] = variables[s+slack_start_index]
-        print(cb_col[s], var_col[s])
     # Se prefieren las variables artificiales en var_col y cb_col
-    print(artifitial_vars, "AAAAAAAAA")
     if len(artifitial_vars) > 0:
         art_start_index = len(variables) - len(artifitial_vars)
         for a in artifitial_vars:
@@ -131,18 +129,11 @@ def simplex(objective, restrictions, variables, maximize) -> (dict[str, float], 
 
 
 def solve_simplex_r(values, variables, restrictions, cb_col, var_col, zj_row, z_zj_row, maximize, iteracion) -> (dict[str, float], float):
-    print(f'--------------------------- Iteracion {iteracion}')
-    print(f'Cb {cb_col} , Vars {var_col}')
-
     # Se calcula zj
-    #print(f'Zj Prev {zj_row}')
-    #print(f'Z-Zj Prev {z_zj_row}')
     for i in range(0, len(zj_row)):
-        print(f'Zj[{i}] = {cb_col} * {restrictions[:,i]}')
         zj_row[i] = np.dot(cb_col, restrictions[:, i])
     # Se calcula z - zj
     z_zj_row = np.subtract(values, zj_row)
-    print(f'Zj:   {zj_row}\nZ-Zj: {z_zj_row}')
     # Se verifica condición de parada
     iteration_success = False
     if maximize:
@@ -160,7 +151,6 @@ def solve_simplex_r(values, variables, restrictions, cb_col, var_col, zj_row, z_
         solution: dict[str, float] = dict()
         for i in range(0, len(var_col)):
             solution[var_col[i]] = b_col[i]
-        print(solution, result)
         return solution, result
 
     # Se calcula la columna del pivote
@@ -169,11 +159,11 @@ def solve_simplex_r(values, variables, restrictions, cb_col, var_col, zj_row, z_
         pivot_col = np.argmax(z_zj_row)
     else:
         pivot_col = np.argmin(z_zj_row)
-    print(pivot_col)
     col_values = restrictions[:, pivot_col]
     # Se calculan los ratios
     # :, -1 es la columna B
-    ratios = np.divide(restrictions[:, -1], col_values, out=np.zeros_like(restrictions[:, -1]), where=col_values!=0)
+    ratios = np.divide(restrictions[:, -1], col_values,
+                       out=np.zeros_like(restrictions[:, -1]), where=col_values != 0)
     # Se calcula la fila del pivote
     pivot_row = -1
     lowest_ratio = 1000000
@@ -182,13 +172,13 @@ def solve_simplex_r(values, variables, restrictions, cb_col, var_col, zj_row, z_
         if val > 0 and val < lowest_ratio:
             lowest_ratio = ratios[i]
             pivot_row = i
-    print("RATIOS", ratios, pivot_row, lowest_ratio)
     # Ya se tiene el pivote, se pone en 1 la fila del pivote si no lo esta
     if col_values[pivot_row] != 1:
-        #for i in range(0, len(restrictions[0])):
+        # for i in range(0, len(restrictions[0])):
         #    restrictions[pivot_row][i] = restrictions[pivot_row][i] / \
         #        restrictions[pivot_row][pivot_col]
-        restrictions[pivot_row] = np.divide(restrictions[pivot_row], restrictions[pivot_row][pivot_col], out=np.zeros_like(restrictions[pivot_row]), where=restrictions[pivot_row][pivot_col]!=0)
+        restrictions[pivot_row] = np.divide(restrictions[pivot_row], restrictions[pivot_row][pivot_col], out=np.zeros_like(
+            restrictions[pivot_row]), where=restrictions[pivot_row][pivot_col] != 0)
     # Se colocan las demás filas en 0.
     for row in range(0, len(col_values)):
         if row != pivot_row:
@@ -199,6 +189,10 @@ def solve_simplex_r(values, variables, restrictions, cb_col, var_col, zj_row, z_
                 restrictions[row], multiplied_difference)
     cb_col[pivot_row] = values[pivot_col]
     var_col[pivot_row] = variables[pivot_col]
-    print(cb_col, var_col)
     # llamado recursivo
     return solve_simplex_r(values, variables, restrictions, cb_col, var_col, zj_row, z_zj_row, maximize, iteracion+1)
+
+
+def simplex_solver(objective, restrictions, maximize) -> (dict[str, float], float):
+    problem = parse_problem(objective, restrictions, maximize)
+    return simplex(problem[0], problem[1], problem[2], maximize)

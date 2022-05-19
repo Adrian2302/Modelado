@@ -10,5 +10,6 @@ if __name__ == "__main__":
                          "x1 <= 5"]
     maximize = True
 
-    problem = parse_problem(objective, restrictions_list, maximize)
-    simplex = simplex(problem[0], problem[1], problem[2], maximize)
+    solution = simplex_solver(objective, restrictions_list, maximize)
+    print(
+        f"Simplex call:\n Sol: {solution[0]}\nOptimized max/min: {solution[1]}")
