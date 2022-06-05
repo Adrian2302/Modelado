@@ -78,3 +78,11 @@ def calculate_transitions(words, sequences):
                 prob_matrix[r][c] = 0
 
     return prob_matrix
+
+
+def create_model(words, ngrams):
+    decorated = add_decorators(words, "$", ngrams)
+    sequences = get_sequences(decorated, ngrams)
+    prob_matrix = calculate_transitions(decorated, sequences)
+
+    return(prob_matrix, sequences)
