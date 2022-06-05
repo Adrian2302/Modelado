@@ -1,11 +1,12 @@
-import csv 
+import csv
+
 
 def load_words(filename):
     words = []
 
-    with open(filename) as csvfile:    
-        csvReader = csv.reader(csvfile)    
-        for row in csvReader:        
+    with open(filename) as csvfile:
+        csvReader = csv.reader(csvfile)
+        for row in csvReader:
             words.append(row[0])
 
     return words
@@ -16,14 +17,15 @@ def add_decorators(words, decorator, n):
     repeated_decorator = decorator*n
     # Para cada palabra en el vector words se pone en minuscula y se le agregan los decoradores
     for i in range(len(words)):
-        words_copy.append(repeated_decorator + words[i].lower() + repeated_decorator)
-        
+        words_copy.append(repeated_decorator +
+                          words[i].lower() + repeated_decorator)
+
     return words_copy
 
 
 def get_sequences(words, n):
     final_vector = []
-    # Primero se iterar por cada palabra del vector
+    # Primero se itera por cada palabra del vector
     for word in words:
         counter = 0
         # Luego desde cada letra de la palabra, vamos sacando n letras
@@ -37,3 +39,4 @@ def get_sequences(words, n):
                 final_vector.append(result)
             counter = counter+1
     final_vector = sorted(final_vector)
+    return final_vector
