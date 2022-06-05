@@ -40,3 +40,22 @@ def get_sequences(words, n):
             counter = counter+1
     final_vector = sorted(final_vector)
     return final_vector
+
+
+def calculate_transitions(words, sequences):
+    seq_length = len(sequences)
+    # inicializar matriz y diccionario
+    prob_matrix = [[0 for _ in range(seq_length)] for _ in range(seq_length)]
+    seq_list = [{} for _ in range(seq_length)]
+    # por cada secuencia, iterar por cada palabra buscando la secuencia que le sigue y agregarla a su respectivo diccionario
+    seq_index = 0
+    for s in sequences:
+        for w in words:
+            index = 0
+            jump_size = len(s)
+            while index < len(w):
+                print("word:", w)
+                print("sequence:", s)
+                if w[index:index+jump_size] == s:
+                    seq_list[seq_index][w[index+jumpsize:index+2*jump_size]] =
+    # a partir de cada diccionario, ver las ocurrencias que le siguen a cada secuencia y cuantas veces aparecieron. A partir de estos números se saca la probabilidad para ir a llenar la matriz
