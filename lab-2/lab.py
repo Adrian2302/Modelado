@@ -45,7 +45,6 @@ def get_sequences(words, n):
 
 
 def calculate_transitions(words, sequences):
-    print("Words:", words)
     seq_length = len(sequences)
     # inicializar matriz y diccionario
     prob_matrix = [[0 for _ in range(seq_length)] for _ in range(seq_length)]
@@ -67,9 +66,6 @@ def calculate_transitions(words, sequences):
                 index += 1
         seq_index += 1
 
-    for s in range(seq_length):
-        print(f"--- {sequences[s]} ---")
-        print(f'dict: {dict_list[s]}\n\n')
     # Ver las ocurrencias que le siguen a cada secuencia y cuantas veces aparecieron. A partir de estos números se saca la probabilidad para ir a llenar la matriz
     for r in range(seq_length):
         count = sum(dict_list[r].values())
@@ -91,13 +87,14 @@ def create_model(words, ngrams):
 
 
 def generate_word(model, seed):
-    random_number = random.uniform(0, 1)
+    r = random.Random()
+    r.seed(seed)
     row = 0
     finish = False
     new_word = ""
 
     while finish == False:
-        random_number = random.uniform(0, 1)
+        random_number = r.uniform(0, 1)
         found = False
         prob_dict = {}
         sum = 0
@@ -111,7 +108,6 @@ def generate_word(model, seed):
                 row = key
                 new_word = new_word + model[1][key]
         if bool(prob_dict) == False or row == 0:
-                finish = True
-    
-    print(new_word)
+            finish = True
 
+    return new_word

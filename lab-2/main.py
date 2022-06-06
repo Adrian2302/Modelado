@@ -1,11 +1,18 @@
 from lab import *
+import random
 
 if __name__ == "__main__":
 
-    words = load_words("test.txt")
-    results = create_model(words, 1)
-    #print(results)
+    words = load_words("pokemon.csv")
 
-    for r in range(len(results[0])):
-        print(r, results[1][r], results[0][r])
-    generate_word(results, 1)
+    model1 = create_model(words, 1)
+    model2 = create_model(words, 2)
+    model3 = create_model(words, 3)
+
+    word1 = generate_word(model1, 17)
+    word2 = generate_word(model2, 42)
+    word3 = generate_word(model3, 21)
+
+    print("model(n=1), seed=17", word1)
+    print("model(n=2), seed=42", word2)
+    print("model(n=3), seed=21", word3)
