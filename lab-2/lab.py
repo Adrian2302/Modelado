@@ -1,4 +1,6 @@
 import csv
+import random
+import numpy as np
 
 
 def load_words(filename):
@@ -86,3 +88,30 @@ def create_model(words, ngrams):
     prob_matrix = calculate_transitions(decorated, sequences)
 
     return(prob_matrix, sequences)
+
+
+def generate_word(model, seed):
+    random_number = random.uniform(0, 1)
+    row = 0
+    finish = False
+    new_word = ""
+
+    while finish == False:
+        random_number = random.uniform(0, 1)
+        found = False
+        prob_dict = {}
+        sum = 0
+        for column in range(len(model[0][row])):
+            if model[0][row][column] != 0:
+                sum = sum + model[0][row][column]
+                prob_dict[column] = sum
+        for key in prob_dict:
+            if(random_number <= prob_dict[key] and found == False):
+                found = True
+                row = key
+                new_word = new_word + model[1][key]
+        if bool(prob_dict) == False or row == 0:
+                finish = True
+    
+    print(new_word)
+
