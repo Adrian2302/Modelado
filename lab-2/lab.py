@@ -111,3 +111,31 @@ def generate_word(model, seed):
             finish = True
 
     return new_word
+
+
+def get_probability(model, word):
+    # setup
+    prob_matrix = model[0]
+    sequences = model[1]
+    word = sequences[0] + word.lower() + sequences[0]
+    seq_size = len(sequences[0])
+    seq_index_dict = {}
+    for s in range(len(sequences)):
+        seq_index_dict[sequences[s]] = s
+    # se inicializa la probabilidad en 0 y despues se va iterando en la matriz hasta llegar a la palabra
+    current_seq = 0
+    probability = 1
+    index = 0
+    while index < len(word)-1:
+        # next_seq = word[(i+1)*seq_size:((i+1)*seq_size)+seq_size]
+        # current_seq = next_seq_index
+        # print(f"Current seq: {sequences[current_seq]}")
+        # print(f"next seq: {next_seq}")
+        current_seq = word[index:index + seq_size]
+        next_seq = word[(index+1):(index+1) + seq_size]
+        current_seq_index = seq_index_dict[current_seq]
+        next_seq_index = seq_index_dict[next_seq]
+        probability = probability * \
+            prob_matrix[current_seq_index][next_seq_index]
+        index += seq_size
+    return probability
