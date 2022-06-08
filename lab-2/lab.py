@@ -86,28 +86,26 @@ def create_model(words, ngrams):
 def generate_word(model, seed):
     r = random.Random()
     r.seed(seed)
-    row = 0
-    finish = False
+
+    prob_matrix = model[0]
+    sequences = model[1]
+    current_seq = 0
+    built = False
     new_word = ""
 
-    while finish == False:
+    while not built:
         random_number = r.uniform(0, 1)
-        found = False
-        prob_dict = {}
-        sum = 0
-        for column in range(len(model[0][row])):
-            if model[0][row][column] != 0:
-                sum = sum + model[0][row][column]
-                prob_dict[column] = sum
-        for key in prob_dict:
-            if(random_number <= prob_dict[key] and found == False):
-                found = True
-                row = key
-                new_word = new_word + model[1][key]
-        if bool(prob_dict) == False or row == 0:
-            finish = True
-
-    return new_word
+        for s in range(len(sequences)):
+            if random_number < prob_matrix[current_seq][s]:
+                if s == 0:
+                    built = True
+                else:
+                    new_word += sequences[s][-1:]
+                    current_seq = s
+                break
+            else:
+                random_number -= prob_matrix[current_seq][s]
+    return new_word.replace('$', '')
 
 
 def get_probability(model, word):
