@@ -1,6 +1,5 @@
 import csv
 import random
-import numpy as np
 
 
 def load_words(filename):
