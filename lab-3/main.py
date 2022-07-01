@@ -1,4 +1,4 @@
 from lab import *
 
 if __name__ == "__main__":
-    random_exp(1)
+    print(random_exp(1/15))
