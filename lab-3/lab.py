@@ -2,6 +2,7 @@ import random
 import math
 import time
 from typing import Callable
+import numpy as np
 
 
 def random_exp(lambd):
@@ -36,7 +37,7 @@ class Client():
 
 class Server():
     
-    def __init__(self, service_time, queue: Queue):
+    def __init__(self, service_time):
         self.service_time = service_time
         #Tiene que estar en SEGUNDOS
     
@@ -50,6 +51,59 @@ class Queue():
     def __init__(self, lmax, s, lambd: Callable, mu: Callable):
         self.lmax = lmax
         self.server_count = s
+        self.lambd = lambd
+        self.mu = mu
     
-    def simulation(time_limit):
-        #aqui quede xd
+    def simulation(self, time_limit):
+        n = 0
+        current_time = 0
+        queue = []
+        servers = np.ones([self.server_count], dtype=int)
+
+        time_client = current_time + random_exp(self.lambd(n))  # Se calcula la llegada del primer cliente
+        new_event = (time_client, "New Client")
+        event_queue = []
+        event_queue.append(new_event)  #se añade a la cola de eventos la hora del primer cliente
+        
+        while(current_time <= time_limit or len(event_queue) > 0):  # Siempre y cuando no se pase del time limite o si la cola no está vacía, entonces se itera
+            current_event = event_queue[0]
+            event_queue.pop(0)
+
+            if(current_event[1] == "New Client"):  # Si la cola de eventos saca un cliente nuevo
+                n = n + 1
+                current_time = current_event[0]
+
+                index = np.where(servers == 1) # Se revisa si hay servidores disponibles
+                if len(index[0]) > 0: # Si hay servidores disponibles, entonces se pasa el cliente a un servidor y se calcula el tiempo de finalizacion del servicio
+                    servers[index[0][0]] = 0
+                
+                    time_release_server = current_time + random_exp(self.mu(n))
+                    new_event = (time_release_server, servers[index[0][0]], "Server")
+                    event_queue.append(new_event)
+
+                else:  # Si no hay servidores disponibles, entonces se agrega el cliente a la cola.
+                    if(len(queue) < self.lmax):
+                        queue.append(current_event)
+
+                time_client = current_time + random_exp(self.lambd(n))
+                new_event = (time_client, "New Client")
+
+
+            else:  # Caso donde la cola de eventos sea que se liberó un servidor
+                n = n - 1
+                current_time = current_event[0]
+                if len(queue) > 0:
+                    current_event = queue[0]
+                    queue.pop(0)
+
+                    time_release_server = current_time + random_exp(self.mu(n))
+                    new_event = (time_release_server, current_event[1], "Server")
+                    event_queue.append(new_event)
+
+                else:
+                    servers[current_event[1]] = 1
+
+            event_queue.sort()
+
+
+                
