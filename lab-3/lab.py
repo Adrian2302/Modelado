@@ -67,7 +67,6 @@ class Queue():
         
         while(current_time <= time_limit or len(event_queue) > 0):  # Siempre y cuando no se pase del time limite o si la cola no está vacía, entonces se itera
             current_event = event_queue[0]
-            print(current_time)
             event_queue.pop(0)
 
             if(current_event[1] == "New Client"):  # Si la cola de eventos saca un cliente nuevo
@@ -79,7 +78,6 @@ class Queue():
                 if len(index[0]) > 0: # Si hay servidores disponibles, entonces se pasa el cliente a un servidor y se calcula el tiempo de finalizacion del servicio
                     servers[index[0][0]] = 0
 
-                    print(n, '1')
                     time_release_server = current_time + random_exp(self.mu(n))
                     new_event = (time_release_server, index[0][0], "Server")
                     event_queue.append(new_event)
@@ -89,7 +87,6 @@ class Queue():
                         queue.append(current_event)
 
                 if(current_time <= time_limit):
-                    print(n, '2')
                     time_client = current_time + random_exp(self.lambd(n))
                     new_event = (time_client, "New Client")
                     event_queue.append(new_event)
@@ -102,7 +99,6 @@ class Queue():
                     current_event = queue[0]
                     queue.pop(0)
 
-                    print(n, '3')
                     time_release_server = current_time + random_exp(self.mu(n))
                     new_event = (time_release_server, index, "Server")
                     event_queue.append(new_event)
