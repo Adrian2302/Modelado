@@ -79,6 +79,8 @@ class Queue():
         self.lambd = lambd
         self.mu = mu
         self.total_idle_time = 0.0
+        self.total_queue_time = 0.0
+        self.total_service_time = 0.0
     
     def simulation(self, time_limit):
         n = 0
@@ -86,7 +88,10 @@ class Queue():
         queue = []
         servers = [Server() for i in range(self.server_count)]
         time_client = current_time + random_exp(self.lambd(n))  # Se calcula la llegada del primer cliente
-        new_event = (time_client, Client())
+        client = Client()
+        clients = [client]
+        new_event = (time_client, client)
+
         event_queue = []
         event_queue.append(new_event)  #se añade a la cola de eventos la hora del primer cliente
         
@@ -121,7 +126,9 @@ class Queue():
 
                 if(current_time <= time_limit):
                     time_client = current_time + random_exp(self.lambd(n))
-                    new_event = (time_client, Client())
+                    client = Client()
+                    clients.append(client)
+                    new_event = (time_client, client)
                     event_queue.append(new_event)
 
 
@@ -144,8 +151,17 @@ class Queue():
         #Calcular tiempo sin hacer nada de los servidores
         for s in servers:
             self.total_idle_time += s.get_idle_time()
-        self.total_idle_time /= self.server_count
 
-        print(self.lost_count)
+        for c in clients:
+            q_time, s_time, o_time = c.get_times()
+            self.total_queue_time += q_time
+            self.total_service_time += s_time
+
+        print("---TIEMPOS---")
+        print("Tiempo inactivo promedio de servidores:", (self.total_idle_time / self.server_count))
+        print("Tiempo en cola promedio de clientes:", (self.total_queue_time / self.client_count))
+        print("Tiempo en atención promedio de clientes:", (self.total_service_time / self.client_count))
+
+
 
                 
