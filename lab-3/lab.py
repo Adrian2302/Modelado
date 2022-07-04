@@ -118,15 +118,17 @@ class Queue():
 
                 else:  # Si no hay servidores disponibles, entonces se agrega el cliente a la cola.
                     if len(queue) + self.server_count < self.lmax and current_time <= time_limit:
-                        queue.append(current_event)
                         client = current_event[1]
                         client.start_queue(current_time)
+                        current_event = (current_time, client)
+                        queue.append(current_event)
                     else:
                         self.lost_count += 1
 
                 if(current_time <= time_limit):
                     time_client = current_time + random_exp(self.lambd(n))
                     client = Client()
+                    client.start_queue(current_time)
                     clients.append(client)
                     new_event = (time_client, client)
                     event_queue.append(new_event)
@@ -158,8 +160,10 @@ class Queue():
             self.total_service_time += s_time
 
         print("---TIEMPOS---")
-        print("Tiempo inactivo promedio de servidores:", (self.total_idle_time / self.server_count))
+        print("Cantidad de clientes servidos:", (self.client_count))
+        print("Cantidad de clientes perdidos:", (self.lost_count))
         print("Tiempo en cola promedio de clientes:", (self.total_queue_time / self.client_count))
+        print("Tiempo inactivo promedio de servidores:", (self.total_idle_time / self.server_count))
         print("Tiempo en atención promedio de clientes:", (self.total_service_time / self.client_count))
 
 
