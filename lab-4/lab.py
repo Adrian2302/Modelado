@@ -6,7 +6,6 @@ import math
 
 def good_abm(n):
     k = math.log(n,2)
-
     k = round(k) #V olverlo un numero entero
 
     m = 2 ** (k+1) # m = 2^k
@@ -24,6 +23,14 @@ def checkOdd(n):
     if n % 2 == 0:
         found = False
     return found
+
+def compare_hands(player, opponent): # https://github.com/fogleman/Poker
+    #Falta
+    pass
+
+def simulate(initial_cards, rolls, generator):
+    #Falta
+    pass
 
 class CongruentialGenerator():
     def __init__(self, a, b, m):
