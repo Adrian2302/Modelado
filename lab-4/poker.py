@@ -16,8 +16,10 @@ class Hand():
     def __init__(self, cards: list[Card]):
         self.cards: list[Card] = cards
         self.dist = {i:0 for i in range(1, 15)}
+        self.values = []
         for card in self.cards:
             val = card.get_value()
+            self.values.append(val)
             self.dist[val] += 1
         self.dist[1] = self.dist[14]
         #Calcular rank
@@ -83,12 +85,43 @@ def compare_hands(player: list[Card], opponent: list[Card]):
     else:
         return tie_break(player_hand, opponent_hand)
 
+def tie_break(player: Hand, opponent: Hand):
+    #Si son straights o straight flush:
+    if player.straight_high_card() is not None:
+        return player.straight_high_card() > opponent.straight_high_card()
+    
+    #Para four of a kind, full house, three of a kind
+    for i in range(2):
+        if player.card_count(4-i) is not None:
+            return player.card_count(4-i) > opponent.card_count(4-i)
+    
+    #Ver cuales son las parejas
+    p_1 = player.card_count(2)
+    o_1 = opponent.card_count(2)
+    #Caso complejo, si son dos parejas
+    if player.rank == 2:
+        p_2 = player.card_count(2, exclude=p_1)
+        o_2 = opponent.card_count(2, exclude=o_1)
+        if p_2 != o_2:
+            return p_2 > o_2
+        else:
+            if p_1 != o_1:
+                return p_1 > o_1
+            else: #kicker se refiere a la ultima carta que queda
+                kicker_p = [c for c in player.values if c not in (p_1, p_2)]
+                kicker_o = [c for c in opponent.values if c not in (o_1, o_2)]
+                return highest_card(kicker_p, kicker_o)
+    
+    #Caso es una pareja:
+    if player.rank == 1:
+        kickers_p = [c for c in player.values if c != p_1]
+        kickers_o = [c for c in opponent.values if c != o_1]
+        return highest_card(kickers_p, kickers_o)
 
-if __name__ == "__main__":
-    cards1 = []
-    for i in range(10,15):
-        cards1.append(Card(i,"S"))
-    cards2 = []
-    for i in range(9,14):
-        cards2.append(Card(i,"S"))
-    print(compare_hands(cards2, cards1))
+    #Si son flush o no hay nada
+    return highest_card(player.values, opponent.values)
+
+def highest_card(player: list[int], opponent: list[int]):
+    h_player = max(player)
+    h_opponent = max(opponent)
+    return h_player > h_opponent
