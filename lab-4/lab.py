@@ -1,5 +1,7 @@
 import random
 import itertools
+import time
+import math
 from poker import *
 
 def good_abm(n):
@@ -58,25 +60,33 @@ def simulate(initial_cards: list[Card], rolls: int, generator):
 
 def remove_from_deck(deck: list[Card], cards: list[Card]):
     for c in deck:
-        for i in initial_cards:
+        for i in cards:
             if c.value == i.value and c.color == i.color:
                 deck.remove(c)
     return deck
 
 def find_best_combination(table_cards: list[Card], hand: list[Card]):
     all_cards = table_cards + hand
-    print(len(all_cards))
     # Se debe hacer un 7C5
     all_combs = itertools.combinations(all_cards, 5)
     # Se inicia la mejor mano como la primera
-    best_hand: list[Card] = all_combs[0]
-    for comb in all_combs:
+    combs_list = []
+    for combinations in all_combs:
+        combs_list.append(combinations)
+    best_hand: list[Card] = combs_list[0]
+    for comb in combs_list:
         if compare_hands(comb, best_hand):
             best_hand = comb
     return best_hand
 
 def generate_random_hand(num_cards: int, deck: list[Card]):
-    raise NotImplementedError()
+    new_hand = []
+    for i in range (0, num_cards):
+        card = random.randint(0, len(deck))
+        while card in new_hand:
+            card = random.randint(0, len(deck))
+        new_hand.append(deck[card])
+    return new_hand
 
 class CongruentialGenerator():
     def __init__(self, a, b, m):

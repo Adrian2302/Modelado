@@ -11,7 +11,7 @@ if __name__ == "__main__":
 
     print(values, period)
     '''
-
+    '''
     player = []
     opponent = []
     for i in range(2):
@@ -24,3 +24,10 @@ if __name__ == "__main__":
     opponent.append(Card(13,'S'))
     
     print(compare_hands(player, opponent))
+    '''
+
+    values = good_abm(10000001)
+    generator = CongruentialGenerator(values[0], values[1], values[2])
+    period = generator.period()
+    print(values[0], values[1])
+    print(values[2], period)
