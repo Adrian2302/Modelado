@@ -87,7 +87,7 @@ def compare_hands(player: list[Card], opponent: list[Card]):
         return False
     #Caso oponente tiene mejor mano
     else:
-        return None
+        return tie_break(player_hand, opponent_hand)
 
 def tie_break(player: Hand, opponent: Hand):
     #Si son straights o straight flush:

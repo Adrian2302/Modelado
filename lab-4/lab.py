@@ -1,4 +1,4 @@
-import random
+#import random
 import itertools
 import time
 import math
@@ -38,11 +38,11 @@ def simulate(initial_cards: list[Card], rolls: int, generator):
     #Ciclo de n (rolls) simulaciones
     for i in range(rolls):
         #Se generan dos cartas aleatorias para el oponente
-        opponent_hand = generate_random_hand(2, deck)
+        opponent_hand = generate_random_hand(2, deck, generator)
         #Se quitan las cartas del oponente del deck
         deck = remove_from_deck(deck, opponent_hand)
         #Se generan las cartas de la mesa
-        table_cards = generate_random_hand(5, deck)
+        table_cards = generate_random_hand(5, deck, generator)
         #Simulacion del juego
         p_best_hand = find_best_combination(table_cards, initial_cards)
         o_best_hand = find_best_combination(table_cards, opponent_hand)
@@ -79,12 +79,14 @@ def find_best_combination(table_cards: list[Card], hand: list[Card]):
             best_hand = comb
     return best_hand
 
-def generate_random_hand(num_cards: int, deck: list[Card]):
+def generate_random_hand(num_cards: int, deck: list[Card], generator):
     new_hand = []
     for i in range (0, num_cards):
-        card = random.randint(0, len(deck))
-        while card in new_hand:
-            card = random.randint(0, len(deck))
+        card = generator.random() * len(deck)
+        card = round(card)
+        while deck[card] in new_hand:
+            card = generator.random() * len(deck)
+            card = round(card)
         new_hand.append(deck[card])
     return new_hand
 
@@ -122,24 +124,31 @@ class CongruentialGenerator():
         return xi/m
 
     def period(self):
-        values = []
+        a = self.get_a()
+        b = self.get_b()
+        m = self.get_m()
+        x = 0
+        print(x)
+
         exists = False
-        count = 0
+        count = 1
 
         while exists == False:
-            x = self.random()
-            if x in values:
+            x = (a * x + b) % m
+            if x == 0:
+                print(x)
                 exists = True
             else:
-                values.append(x)
+                print(x)
                 count = count + 1
         #print(count)
         return count
 
 
 
-
+'''
 if __name__ == "__main__":
     card = Card(13, "SPADES")
     card2 = Card(13, "CLUBS")
     simulate([card,card2], 1, None)
+'''
