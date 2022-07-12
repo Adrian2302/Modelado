@@ -66,10 +66,16 @@ def simulate(initial_cards: list[Card], rolls: int, generator):
 
 
 def remove_from_deck(deck: list[Card], cards: list[Card]):
+    print("Deck")
+    print(deck)
+    print("Cartas por quitar")
+    print(cards)
+    print("Cartas removidas")
     for c in deck:
         for i in cards:
             if c.value == i.value and c.color == i.color:
                 deck.remove(c)
+                print(c)
     return deck
 
 def find_best_combination(table_cards: list[Card], hand: list[Card]):
@@ -95,13 +101,16 @@ def generate_random_hand(num_cards: int, deck: list[Card], generator):
         if card <= -1:
             card = 0
         #print("carta:", card, len(deck))
-        while deck[card] in new_hand == True:
+        while deck[card] in new_hand:
             card = generator.random() * len(deck)
             card = round(card) - 1
             if card <= -1:
                 card = 0
             #print("carta a:", card, len(deck))
         new_hand.append(deck[card])
+    
+    if any(new_hand.count(x) > 1 for c in new_hand)
+        print("error")
     return new_hand
 
 class CongruentialGenerator():

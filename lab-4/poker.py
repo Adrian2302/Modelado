@@ -14,6 +14,8 @@ class Card():
     def get_value(self):
         return self.value
 
+    def __repr__(self):
+        return str(self.value) + self.color
 
 class Hand():
 
@@ -137,7 +139,8 @@ def get_deck():
             cards.append(Card(v,c))
             #print(c,v)
     return cards
-'''
+
+
 if __name__ == "__main__":
     cards = get_deck()
-'''
+    print(cards)
