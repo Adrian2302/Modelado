@@ -6,12 +6,9 @@ import math
 
 def good_abm(n):
     k = math.log(n,2)
-    k = round(k) #V olverlo un numero entero
-
+    k = round(k) #Volverlo un numero entero
     m = 2 ** (k+1) # m = 2^k
-
     a = 4 * n + 1 # a = 4*c + 1
-
     b = n
     while checkOdd(b) == False: # Primer numero primo a partir de n
         b = b + 1
