@@ -32,7 +32,22 @@ if __name__ == "__main__":
     print(values[0], values[1], values[2])
     print(period)
     '''
-    generator = CongruentialGenerator(3,2,34)
+    # Parte 5
+
+    # a)
+    values = good_abm(10000001)
+    generator = CongruentialGenerator(values[0], values[1], values[2])
+
+    # b)
+    period = generator.period()
+    print(values[2], period)
+
+    # c)
+    # i.
     card = Card(13, "SPADES")
     card2 = Card(13, "CLUBS")
-    simulate([card,card2], 1, generator)
+    simulate([card,card2], 100000, generator)
+
+    # ii.
+
+    # iii.

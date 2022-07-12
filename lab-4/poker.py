@@ -61,7 +61,7 @@ class Hand():
             return 8
         if self.card_count(4) is not None:
             return 7
-        if self.card_count(3) is not None and card_count(2) is not None:
+        if self.card_count(3) is not None and self.card_count(2) is not None:
             return 6
         if self.is_flush():
             return 5
@@ -135,7 +135,7 @@ def get_deck():
     for c in COLORS:
         for v in VALUES:
             cards.append(Card(v,c))
-            print(c,v)
+            #print(c,v)
     return cards
 '''
 if __name__ == "__main__":
