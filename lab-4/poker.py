@@ -1,3 +1,7 @@
+#COLORS
+COLORS = ["SPADES","HEARTS","CLUBS","DIAMONDS"]
+#VALUES
+VALUES = [1,2,3,4,5,6,7,8,9,10,11,12,13]
 class Card():
 
     def __init__(self, value, color):
@@ -125,3 +129,15 @@ def highest_card(player: list[int], opponent: list[int]):
     h_player = max(player)
     h_opponent = max(opponent)
     return h_player > h_opponent
+
+def get_deck():
+    cards: list[Card] = []
+    for c in COLORS:
+        for v in VALUES:
+            cards.append(Card(v,c))
+            print(c,v)
+    return cards
+
+if __name__ == "__main__":
+    cards = get_deck()
+    
