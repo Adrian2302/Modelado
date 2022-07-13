@@ -27,7 +27,7 @@ class Hand():
             val = card.get_value()
             self.values.append(val)
             self.dist[val] += 1
-        self.dist[1] = self.dist[14]
+        self.dist[14] = self.dist[1]
         #Calcular rank
         self.rank = self.calc_rank()
 
@@ -49,11 +49,11 @@ class Hand():
         return None
     
     def card_count(self, num, exclude=None):
-        for value in range(2, 15):
-            if value == exclude:
+        for value in range(1, 14):
+            if value == (exclude if exclude != 14 else 1):
                 continue
             if self.dist[value] == num:
-                return value
+                return (value if value != 1 else 14)
         return None
 
     def calc_rank(self):
@@ -84,17 +84,22 @@ def compare_hands(player: list[Card], opponent: list[Card]):
     #Caso player tiene mejor mano
     if player_hand.rank > opponent_hand.rank:
         return True
-    #Caso son iguales
+    #Caso oponente tiene mejor mano
     elif player_hand.rank < opponent_hand.rank:
         return False
-    #Caso oponente tiene mejor mano
+    #Caso son iguales
     else:
         return tie_break(player_hand, opponent_hand)
 
 def tie_break(player: Hand, opponent: Hand):
     #Si son straights o straight flush:
     if player.straight_high_card() is not None:
-        return player.straight_high_card() > opponent.straight_high_card()
+        p_high_card = player.straight_high_card()
+        o_high_card = opponent.straight_high_card()
+        if p_high_card != o_high_card:
+            return p_high_card > o_high_card
+        else:
+            return None
     
     #Para four of a kind, full house, three of a kind
     for i in range(2):
@@ -114,23 +119,34 @@ def tie_break(player: Hand, opponent: Hand):
             if p_1 != o_1:
                 return p_1 > o_1
             else: #kicker se refiere a la ultima carta que queda
-                kicker_p = [c for c in player.values if c not in (p_1, p_2)]
-                kicker_o = [c for c in opponent.values if c not in (o_1, o_2)]
+                kicker_p = [c for c in player.values if (c if not(c == 1 and p_1 == 14) else p_1) not in (p_1, p_2)]
+                kicker_o = [c for c in opponent.values if (c if not(c == 1 and p_1 == 14) else p_1) not in (o_1, o_2)]
                 return highest_card(kicker_p, kicker_o)
     
     #Caso es una pareja:
     if player.rank == 1:
-        kickers_p = [c for c in player.values if c != p_1]
-        kickers_o = [c for c in opponent.values if c != o_1]
+        if p_1 != o_1:
+            return p_1 > o_1
+        kickers_p = [c for c in player.values if (c if not(c == 1 and p_1 == 14) else p_1) != p_1]
+        kickers_o = [c for c in opponent.values if (c if not(c == 1 and o_1 == 14) else o_1) != o_1]
         return highest_card(kickers_p, kickers_o)
 
     #Si son flush o no hay nada
     return highest_card(player.values, opponent.values)
 
 def highest_card(player: list[int], opponent: list[int]):
+    for c in range(len(player)):
+        if player[c] == 1:
+            player[c] = 14
+    for c in range(len(opponent)):
+        if opponent[c] == 1:
+            opponent[c] = 14     
     h_player = max(player)
     h_opponent = max(opponent)
-    return h_player > h_opponent
+    if h_player != h_opponent:
+        return h_player > h_opponent
+    else:
+        return None
 
 def get_deck():
     cards: list[Card] = []
@@ -138,3 +154,11 @@ def get_deck():
         for v in VALUES:
             cards.append(Card(v,c))
     return cards
+
+
+
+if __name__ == "__main__":
+    player = Hand([Card(1,"SPADES"), Card(1, "CLUBS"), Card(13, "HEARTS"), Card(13, "CLUBS"), Card(5,"SPADES")])
+    opp = Hand([Card(1,"SPADES"), Card(1, "CLUBS"), Card(13, "HEARTS"), Card(13, "CLUBS"), Card(4,"SPADES")])
+
+    print(tie_break(player, opp))

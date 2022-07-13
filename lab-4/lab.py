@@ -47,11 +47,14 @@ def simulate(initial_cards: list[Card], rolls: int, generator):
         #Simulacion del juego
         p_best_hand = find_best_combination(table_cards, initial_cards)
         o_best_hand = find_best_combination(table_cards, opponent_hand)
-        if compare_hands(p_best_hand, o_best_hand):
-            win += 1
-        elif not compare_hands(p_best_hand, o_best_hand):
-            lose += 1
-        else: #Si es empate (REVISAR PORQUE AHORITA NUNCA VA A DAR EMPATE)
+        #Llevar score
+        comparison = compare_hands(p_best_hand, o_best_hand)
+        if comparison is not None:
+            if comparison:
+                win += 1
+            else:
+                lose += 1
+        else: #Si es empate
             draw += 1
         #Se vuelven a colocar las cartas del oponente y de la mesa en el deck
         deck = deck + opponent_hand + table_cards
