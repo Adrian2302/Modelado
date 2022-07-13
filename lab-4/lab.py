@@ -40,14 +40,10 @@ def simulate(initial_cards: list[Card], rolls: int, generator):
         #Se generan dos cartas aleatorias para el oponente
         opponent_hand = generate_random_hand(2, deck, generator)
         #Se quitan las cartas del oponente del deck
-        print("primer len deck", len(deck))
         deck = remove_from_deck(deck, opponent_hand)
-        print("oponente", len(opponent_hand))
-        print("segundo len deck", len(deck))
         #Se generan las cartas de la mesa
         table_cards = generate_random_hand(5, deck, generator)
         deck = remove_from_deck(deck, table_cards)
-        print("mesa", len(table_cards))
         #Simulacion del juego
         p_best_hand = find_best_combination(table_cards, initial_cards)
         o_best_hand = find_best_combination(table_cards, opponent_hand)
@@ -58,24 +54,16 @@ def simulate(initial_cards: list[Card], rolls: int, generator):
         else: #Si es empate (REVISAR PORQUE AHORITA NUNCA VA A DAR EMPATE)
             draw += 1
         #Se vuelven a colocar las cartas del oponente y de la mesa en el deck
-        print("len deck1", len(deck))
         deck = deck + opponent_hand + table_cards
-        print("len deck2", len(deck))
     #Fin de ciclo
     return (win/rolls, lose/rolls, draw/rolls)
 
 
 def remove_from_deck(deck: list[Card], cards: list[Card]):
-    print("Deck")
-    print(deck)
-    print("Cartas por quitar")
-    print(cards)
-    print("Cartas removidas")
-    for c in deck:
-        for i in cards:
+    for c in deck[:]:
+        for i in cards[:]:
             if c.value == i.value and c.color == i.color:
                 deck.remove(c)
-                print(c)
     return deck
 
 def find_best_combination(table_cards: list[Card], hand: list[Card]):
@@ -95,22 +83,16 @@ def find_best_combination(table_cards: list[Card], hand: list[Card]):
 def generate_random_hand(num_cards: int, deck: list[Card], generator):
     new_hand = []
     for i in range (0, num_cards):
-        #print("                          ", i)
         card = generator.random() * len(deck)
         card = round(card) - 1
         if card <= -1:
             card = 0
-        #print("carta:", card, len(deck))
         while deck[card] in new_hand:
             card = generator.random() * len(deck)
             card = round(card) - 1
             if card <= -1:
                 card = 0
-            #print("carta a:", card, len(deck))
         new_hand.append(deck[card])
-    
-    if any(new_hand.count(x) > 1 for c in new_hand)
-        print("error")
     return new_hand
 
 class CongruentialGenerator():
@@ -143,7 +125,6 @@ class CongruentialGenerator():
 
         xi = (a * x + b) % m
         self.seed(xi)
-        #print(xi/m)
         return xi/m
 
     def period(self):
@@ -151,7 +132,6 @@ class CongruentialGenerator():
         b = self.get_b()
         m = self.get_m()
         x = 0
-        #print(x)
 
         exists = False
         count = 1
@@ -159,19 +139,7 @@ class CongruentialGenerator():
         while exists == False:
             x = (a * x + b) % m
             if x == 0:
-                #print(x)
                 exists = True
             else:
-                #print(x)
                 count = count + 1
-        #print(count)
         return count
-
-
-
-'''
-if __name__ == "__main__":
-    card = Card(13, "SPADES")
-    card2 = Card(13, "CLUBS")
-    simulate([card,card2], 1, None)
-'''

@@ -137,10 +137,4 @@ def get_deck():
     for c in COLORS:
         for v in VALUES:
             cards.append(Card(v,c))
-            #print(c,v)
     return cards
-
-
-if __name__ == "__main__":
-    cards = get_deck()
-    print(cards)
