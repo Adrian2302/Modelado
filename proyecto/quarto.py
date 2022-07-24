@@ -4,7 +4,8 @@ import time
 import random
 
 class Node:
-    def __init__(self, state: Quarto, parent: Quarto = None, fully_expanded=False):
+    def __init__(self, action, state, parent = None, fully_expanded=False):
+        self.prev_action = action
         self.state = state
         self.games_played = 0
         self.wins = 0
@@ -14,6 +15,7 @@ class Node:
         self.fully_expanded = fully_expanded
 
     def get_best_action(self):
+        if self.state.
         return self.get_best_child().state.chosen_piece
 
     def win_prob(self):
@@ -35,22 +37,30 @@ class Node:
 
     def expand(self):
         visited_states = [ c.state for c in self.children]
-        possible_states = [ do_action(v) for v in self.state.get_available_actions()]
-        possible_states = possible_states - visited_states
+        possible_states = [ self.state.do_action(v) for v in self.state.get_available_actions()]
+        possible_states = [s for s in possible_states if s not in visited_states]
         if len(possible_states) == 1:
             self.fully_expanded = True
 
         chosen_state = random.choice(possible_states)
-        new_child = Node(chosen_state, self, is_leaf)
         is_leaf = chosen_state.has_finished()
+        new_child = Node(chosen_state, self, is_leaf)
         self.children.append(new_child)
         return new_child
 
     def simulate(self):
         current_state = self.state
+        last_state = None
         while not current_state.has_finished():
+            #print(current_state.has_finished())
             possible_actions = self.state.get_available_actions()
+            #print("possible", possible_actions)
             current_state = current_state.do_action(random.choice(possible_actions))
+            if current_state == last_state:
+                print("rip")
+                break
+            #print("current", current_state)
+            last_state = current_state
         return current_state.get_winner()
 
     def back_prop(self, won: bool):
@@ -61,7 +71,7 @@ class Node:
     
 def selection(root: Node, exploitation: float) -> Node:
     current_node = root
-    while not current_node.has_children():
+    while current_node.has_children():
         random_prob = random.uniform(0, 1)
         if random_prob < exploitation:
             #Si no se han explorado todos los hijos, se genera uno nuevo
@@ -80,19 +90,27 @@ def mcts(root, time_limit = 0.25, exploitation=0.5):
     root_node = Node(root)
     #Ciclo mientras no se agota el tiempo
     while time.time() < timeout:
+        #print("1")
         #Se hace la seleccion
-        current_node = selection(root)
+        current_node = selection(root_node, exploitation)
         #Se hace la expansión (un nuevo hijo) para el estado seleccionado
+        #print("2")
         if current_node.state.has_finished():
             continue
-
+        #print("3")
         child = current_node.expand()
         #Se hace la simulacion para el hijo
+        #print("4")
         result = child.simulate()
         #Se hace back propagation
+        #print("5")
         child.back_prop(result)
-
+        #print("6")
+        #print(time.time(), timeout)
+    #print("sali")
     best_action = root_node.get_best_action()
+    print("BEST", best_action)
+
     return best_action
 
 ### DO NOT EDIT ###
