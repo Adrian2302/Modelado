@@ -1,3 +1,6 @@
+#B93825 - Adrián Hernández Young
+#B92277 - Rodrigo Contreras Araya
+
 # -*- coding: utf-8 -*-
 
 import time
@@ -15,13 +18,17 @@ class Node:
         self.fully_expanded = fully_expanded
 
     def get_best_action(self):
+        print("-------------")
+        print(self.games_played)
+        for i in self.children:
+            print(i.win_prob(), i.games_played)
         return self.get_best_child().prev_action
 
     def win_prob(self):
         if self.state.has_finished():
             return self.state.get_winner()
         else:
-            return (self.wins / self.games_played) if (self.games_played == 0) else 0
+            return (self.wins / self.games_played) if (self.games_played != 0) else 0
     
     def has_children(self):
         return True if len(self.children) > 0 else False
@@ -86,7 +93,7 @@ def selection(root: Node, exploitation: float) -> Node:
 
     return current_node
 
-def mcts(root, time_limit = 0.25, exploitation=0.5):
+def mcts(root, time_limit = 1, exploitation=0.5):
     timeout = time.time() + time_limit
     root_node = Node(None, root)
     #Ciclo mientras no se agota el tiempo
