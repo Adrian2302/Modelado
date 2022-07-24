@@ -57,6 +57,8 @@ class Node:
         chosen_action, chosen_state = random.choice(new_actions)
         new_child = Node(chosen_action, chosen_state, self)
         self.children.append(new_child)
+        print(f"Cantidad de hijos: {len(self.children)}")
+        return new_child
 
     def simulate(self):
         current_state = self.state
