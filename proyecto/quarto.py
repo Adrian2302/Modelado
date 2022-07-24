@@ -10,7 +10,6 @@ num_nodes = 0
 class Node:
     def __init__(self, action, state, parent = None, fully_expanded=False):
         global num_nodes
-        print("Se genera un nuevo nodo", num_nodes)
         num_nodes += 1
         self.prev_action = action
         self.state = state
