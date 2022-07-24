@@ -15,10 +15,7 @@ class Node:
         self.fully_expanded = fully_expanded
 
     def get_best_action(self):
-        if self.turn_ai():
-            return self.get_best_child().prev_action
-        else:
-            return self.get_worst_child().prev_action
+        return self.get_best_child().prev_action
 
     def win_prob(self):
         if self.state.has_finished():
@@ -42,7 +39,7 @@ class Node:
         worst_prob = 1
         worst_child = self.children[0]
         for child in self.children:
-            if child.win_prob() < worst_child:
+            if child.win_prob() < worst_prob:
                 worst_child = child
                 worst_prob = child.win_prob()
         return worst_child
@@ -62,17 +59,10 @@ class Node:
 
     def simulate(self):
         current_state = self.state
-        last_state = None
         while not current_state.has_finished():
-            #print(current_state.has_finished())
-            possible_actions = self.state.get_available_actions()
-            #print("possible", possible_actions)
+            possible_actions = current_state.get_available_actions()
             current_state = current_state.do_action(random.choice(possible_actions))
-            if current_state == last_state:
-                print("rip")
-                break
-            #print("current", current_state)
-            last_state = current_state
+           
         return current_state.get_winner()
 
     def back_prop(self, won: bool):
@@ -98,30 +88,20 @@ def selection(root: Node, exploitation: float) -> Node:
 
 def mcts(root, time_limit = 0.25, exploitation=0.5):
     timeout = time.time() + time_limit
-    
     root_node = Node(None, root)
     #Ciclo mientras no se agota el tiempo
     while time.time() < timeout:
-        #print("1")
         #Se hace la seleccion
         current_node = selection(root_node, exploitation)
         #Se hace la expansión (un nuevo hijo) para el estado seleccionado
-        #print("2")
         if current_node.state.has_finished():
             continue
-        #print("3")
         child = current_node.expand()
         #Se hace la simulacion para el hijo
-        #print("4")
         result = child.simulate()
         #Se hace back propagation
-        #print("5")
         child.back_prop(result)
-        #print("6")
-        #print(time.time(), timeout)
-    #print("sali")
     best_action = root_node.get_best_action()
-    print("BEST", best_action)
 
     return best_action
 
