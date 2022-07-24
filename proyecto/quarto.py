@@ -52,17 +52,11 @@ class Node:
         return worst_child
 
     def expand(self):
-        visited_states = [ c.state for c in self.children]
-        possible_states = [ [self.state.do_action(v), v] for v in self.state.get_available_actions()]
-        possible_states = [s for s in possible_states if s[0] not in visited_states]
-        if len(possible_states) == 1:
-            self.fully_expanded = True
-
-        chosen_state, chosen_action = random.choice(possible_states)
-        is_leaf = chosen_state.has_finished()
-        new_child = Node(chosen_action, chosen_state, self, is_leaf)
+        visited_actions = [child.prev_action for child in self.children]
+        new_actions = [[a, self.state.do_action(a)] for a in self.state.get_available_actions() if a not in visited_actions]
+        chosen_action, chosen_state = random.choice(new_actions)
+        new_child = Node(chosen_action, chosen_state, self)
         self.children.append(new_child)
-        return new_child
 
     def simulate(self):
         current_state = self.state
