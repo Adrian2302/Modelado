@@ -18,10 +18,9 @@ class Node:
         self.fully_expanded = fully_expanded
 
     def get_best_action(self):
-        print("-------------")
-        print(self.games_played)
+        print("---------------------------------------------------------------------")
         for i in self.children:
-            print(i.win_prob(), i.games_played)
+            print(i.prev_action, i.win_prob(), i.games_played)
         return self.get_best_child().prev_action
 
     def win_prob(self):
@@ -54,10 +53,11 @@ class Node:
     def expand(self):
         visited_actions = [child.prev_action for child in self.children]
         new_actions = [[a, self.state.do_action(a)] for a in self.state.get_available_actions() if a not in visited_actions]
-        chosen_action, chosen_state = random.choice(new_actions)
-        new_child = Node(chosen_action, chosen_state, self)
+        if len(new_actions) == 1:
+            self.fully_expanded = True
+        chosen = random.choice(new_actions)
+        new_child = Node(chosen[0], chosen[1], self)
         self.children.append(new_child)
-        print(f"Cantidad de hijos: {len(self.children)}")
         return new_child
 
     def simulate(self):
