@@ -15,8 +15,10 @@ class Node:
         self.fully_expanded = fully_expanded
 
     def get_best_action(self):
-        if self.state.
-        return self.get_best_child().state.chosen_piece
+        if self.turn_ai():
+            return self.get_best_child().prev_action
+        else:
+            return self.get_worst_child().prev_action
 
     def win_prob(self):
         if self.state.has_finished():
@@ -29,22 +31,32 @@ class Node:
 
     def get_best_child(self):
         best_prob = -1
-        best_child = None
+        best_child = self.children[0]
         for child in self.children:
             if child.win_prob() > best_prob:
                 best_child = child
+                best_prob = child.win_prob()
         return best_child
+
+    def get_worst_child(self):
+        worst_prob = 1
+        worst_child = self.children[0]
+        for child in self.children:
+            if child.win_prob() < worst_child:
+                worst_child = child
+                worst_prob = child.win_prob()
+        return worst_child
 
     def expand(self):
         visited_states = [ c.state for c in self.children]
-        possible_states = [ self.state.do_action(v) for v in self.state.get_available_actions()]
-        possible_states = [s for s in possible_states if s not in visited_states]
+        possible_states = [ [self.state.do_action(v), v] for v in self.state.get_available_actions()]
+        possible_states = [s for s in possible_states if s[0] not in visited_states]
         if len(possible_states) == 1:
             self.fully_expanded = True
 
-        chosen_state = random.choice(possible_states)
+        chosen_state, chosen_action = random.choice(possible_states)
         is_leaf = chosen_state.has_finished()
-        new_child = Node(chosen_state, self, is_leaf)
+        new_child = Node(chosen_action, chosen_state, self, is_leaf)
         self.children.append(new_child)
         return new_child
 
@@ -87,7 +99,7 @@ def selection(root: Node, exploitation: float) -> Node:
 def mcts(root, time_limit = 0.25, exploitation=0.5):
     timeout = time.time() + time_limit
     
-    root_node = Node(root)
+    root_node = Node(None, root)
     #Ciclo mientras no se agota el tiempo
     while time.time() < timeout:
         #print("1")
