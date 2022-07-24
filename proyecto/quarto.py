@@ -9,6 +9,7 @@ import random
 num_nodes = 0
 class Node:
     def __init__(self, action, state, parent = None, fully_expanded=False):
+        global num_nodes
         print("Se genera un nuevo nodo", num_nodes)
         num_nodes += 1
         self.prev_action = action
@@ -64,24 +65,23 @@ def mcts(root, time_limit = 1, exploitation=0.5):
     while time.time() < timeout:
         current_node = root_node
         while not current_node.is_leaf():
-            #Si ha sido explorado antes
-            if current_node.has_children():
-                rndom_number = random.uniform(0, 1)
-                #Si se explota se va por el mejor hijo
-                if rndom_number > exploitation:
-                    current_node = current_node.get_best_child()
+            rndom_number = random.uniform(0, 1)
+            #Si se explota se va por el mejor hijo
+            if rndom_number > exploitation and current_node.has_children():
+                current_node = current_node.get_best_child()
+            else:
+                possible_actions = current_node.state.get_available_actions()
+                visited_actions = current_node.get_visited_actions()
+                chosen_action = random.choice(possible_actions)
+                #si no se ha visitado entonces se genera un nuevo nodo
+                if chosen_action not in visited_actions:
+                    new_child = Node(chosen_action, current_node.state.do_action(chosen_action), current_node)
+                    current_node.children.append(new_child)
+                    current_node = new_child
                 else:
-                    possible_actions = current_node.state.get_available_actions()
-                    visited_actions = current_node.get_visited_actions()
-                    chosen_action = random.choice(possible_actions)
-                    #si no se ha visitado entonces se genera un nuevo nodo
-                    if chosen_action not in visited_actions:
-                        new_child = Node(chosen_action, current_node.state.do_action(chosen_action), current_node)
-                        current_node.children.append(new_child)
-                        current_node = new_child
-                    else:
-                        child = [c for c in current_node.children if c.prev_action == chosen_action]
-                        current_node = child[0]
+                    child = [c for c in current_node.children if c.prev_action == chosen_action]
+                    current_node = child[0]
+                
         current_node.back_prop(current_node.state.get_winner())
                 
     best_action = root_node.get_best_action()
