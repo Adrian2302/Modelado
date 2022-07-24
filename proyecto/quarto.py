@@ -6,8 +6,11 @@
 import time
 import random
 
+num_nodes = 0
 class Node:
     def __init__(self, action, state, parent = None, fully_expanded=False):
+        print("Se genera un nuevo nodo", num_nodes)
+        num_nodes += 1
         self.prev_action = action
         self.state = state
         self.games_played = 0
@@ -31,6 +34,9 @@ class Node:
     
     def has_children(self):
         return True if len(self.children) > 0 else False
+
+    def is_leaf(self):
+        return self.state.has_finished()
 
     def get_best_child(self):
         best_prob = -1
@@ -58,13 +64,16 @@ class Node:
         chosen = random.choice(new_actions)
         new_child = Node(chosen[0], chosen[1], self)
         self.children.append(new_child)
+        if new_child.is_leaf():
+            winner = new_child.state.get_winner()
+            new_child.back_prop(winner)
         return new_child
 
     def simulate(self):
-        current_state = self.state
-        while not current_state.has_finished():
+        current_node = self
+        while not current_node.is_leaf():
             possible_actions = current_state.get_available_actions()
-            current_state = current_state.do_action(random.choice(possible_actions))
+            new_state = current_node.state.do_action(random.choice(possible_actions))
            
         return current_state.get_winner()
 
@@ -96,16 +105,9 @@ def mcts(root, time_limit = 1, exploitation=0.5):
     while time.time() < timeout:
         #Se hace la seleccion
         current_node = selection(root_node, exploitation)
-        #Se hace la expansión (un nuevo hijo) para el estado seleccionado
-        if current_node.state.has_finished():
-            continue
-        child = current_node.expand()
         #Se hace la simulacion para el hijo
-        result = child.simulate()
-        #Se hace back propagation
-        child.back_prop(result)
+        current_node.simulate()
     best_action = root_node.get_best_action()
-
     return best_action
 
 ### DO NOT EDIT ###
