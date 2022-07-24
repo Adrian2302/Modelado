@@ -47,35 +47,8 @@ class Node:
                 best_prob = child.win_prob()
         return best_child
 
-    def get_worst_child(self):
-        worst_prob = 1
-        worst_child = self.children[0]
-        for child in self.children:
-            if child.win_prob() < worst_prob:
-                worst_child = child
-                worst_prob = child.win_prob()
-        return worst_child
-
-    def expand(self):
-        visited_actions = [child.prev_action for child in self.children]
-        new_actions = [[a, self.state.do_action(a)] for a in self.state.get_available_actions() if a not in visited_actions]
-        if len(new_actions) == 1:
-            self.fully_expanded = True
-        chosen = random.choice(new_actions)
-        new_child = Node(chosen[0], chosen[1], self)
-        self.children.append(new_child)
-        if new_child.is_leaf():
-            winner = new_child.state.get_winner()
-            new_child.back_prop(winner)
-        return new_child
-
-    def simulate(self):
-        current_node = self
-        while not current_node.is_leaf():
-            possible_actions = current_state.get_available_actions()
-            new_state = current_node.state.do_action(random.choice(possible_actions))
-           
-        return current_state.get_winner()
+    def get_visited_actions(self):
+        return [child.prev_action for child in self.children]
 
     def back_prop(self, won: bool):
         self.games_played += 1
@@ -83,30 +56,34 @@ class Node:
         if self.parent is not None:
             self.parent.back_prop(won)
     
-def selection(root: Node, exploitation: float) -> Node:
-    current_node = root
-    while current_node.has_children():
-        random_prob = random.uniform(0, 1)
-        if random_prob < exploitation:
-            #Si no se han explorado todos los hijos, se genera uno nuevo
-            if not current_node.fully_expanded:
-                current_node = current_node.expand()
-            else:
-                current_node = random.choice(current_node.children)
-        else: #Greedy
-            current_node = current_node.get_best_child()
-
-    return current_node
 
 def mcts(root, time_limit = 1, exploitation=0.5):
     timeout = time.time() + time_limit
     root_node = Node(None, root)
     #Ciclo mientras no se agota el tiempo
     while time.time() < timeout:
-        #Se hace la seleccion
-        current_node = selection(root_node, exploitation)
-        #Se hace la simulacion para el hijo
-        current_node.simulate()
+        current_node = root_node
+        while not current_node.is_leaf():
+            #Si ha sido explorado antes
+            if current_node.has_children():
+                rndom_number = random.uniform(0, 1)
+                #Si se explota se va por el mejor hijo
+                if rndom_number > exploitation:
+                    current_node = current_node.get_best_child()
+                else:
+                    possible_actions = current_node.state.get_available_actions()
+                    visited_actions = current_node.get_visited_actions()
+                    chosen_action = random.choice(possible_actions)
+                    #si no se ha visitado entonces se genera un nuevo nodo
+                    if chosen_action not in visited_actions:
+                        new_child = Node(chosen_action, current_node.state.do_action(chosen_action), current_node)
+                        current_node.children.append(new_child)
+                        current_node = new_child
+                    else:
+                        child = [c for c in current_node.children if c.prev_action == chosen_action]
+                        current_node = child[0]
+        current_node.back_prop(current_node.state.get_winner())
+                
     best_action = root_node.get_best_action()
     return best_action
 
